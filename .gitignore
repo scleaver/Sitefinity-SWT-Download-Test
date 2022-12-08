@@ -347,3 +347,6 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+SitefinityWebApp/App_Data/Sitefinity/Sitefinity.lic
+SitefinityWebApp/App_Data/Sitefinity/Search/
