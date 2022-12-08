@@ -1230,8 +1230,8 @@
     <Content Include="App_Data\RadSpell\en-US.tdf" />
     <Content Include="App_Data\RadSpell\de-DE.tdf" />
     <Content Include="App_Data\GeoLocation\GeoLite2-City.mmdb" />
-    <Content Include="connectionStrings.config" />
     <Content Include="App_Data\Sitefinity\Configuration\**" />
+    <Content Include="App_Data\Sitefinity\Sitefinity.lic" />
     <None Include="packages.config" />
     <Content Include="ResourcePackages\Bootstrap4\README.md" />
     <Content Include="ResourcePackages\Bootstrap4\razorgenerator.directives" />
