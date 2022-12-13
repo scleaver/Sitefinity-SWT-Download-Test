@@ -1206,11 +1206,17 @@
     <Compile Include="Api\AuthDownloadController.cs" />
     <Compile Include="App_Start\RazorGeneratorMvcStart.cs" />
     <Compile Include="AzureWebRole.cs" />
+    <Compile Include="CookieSaverMiddlewareCustom.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RelyingPartyMiddlewareCustom.cs" />
+    <Compile Include="SitefinityAuthenticationMiddlewareCustom.cs" />
+    <Compile Include="SitefinityMiddlewareCustom.cs" />
+    <Compile Include="Startup.cs" />
+    <Compile Include="SWTAuthenticationFactoryCustom.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AdminApp\elements.af6306f9324e9f00a7f0.bundle.js.map" />
