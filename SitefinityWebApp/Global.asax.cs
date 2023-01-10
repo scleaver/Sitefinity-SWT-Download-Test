@@ -1,43 +1,76 @@
 ﻿using System;
-using System.Net.Http.Headers;
+using System.Web;
 using System.Web.Http;
+using System.Web.Mvc;
+using System.Web.Routing;
+using Ninject;
+using Ninject.Web.Common;
+using Ninject.Web.WebApi;
+using Telerik.Microsoft.Practices.Unity;
 using Telerik.Sitefinity.Abstractions;
-using Telerik.Sitefinity.Data;
+using Telerik.Sitefinity.Mvc;
 
 namespace SitefinityWebApp
 {
-    public class Global : System.Web.HttpApplication
+    public class Global : NinjectHttpApplication
     {
-        protected void Application_Start(object sender, EventArgs e)
+        protected override void OnApplicationStarted()
         {
-            Bootstrapper.Initialized += new EventHandler<ExecutedEventArgs>(this.Bootstrapper_Initialized);
+            base.OnApplicationStarted();
+
+            Telerik.Sitefinity.Abstractions.Bootstrapper.Bootstrapped += this.Bootstrapper_Bootstrapped;
         }
 
-        private void Bootstrapper_Initialized(object sender, ExecutedEventArgs e)
+        protected override IKernel CreateKernel()
         {
-            if (e.CommandName == "Bootstrapped")
-            {
-                if (Bootstrapper.IsReady)
-                {
-                    GlobalConfiguration.Configure(Register);
-                }
-            }
+            IKernel kernel = new StandardKernel();
+            NinjectKernel = kernel;
+            return kernel;
         }
 
-        public static void Register(HttpConfiguration config)
+        public static IKernel NinjectKernel { get; private set; }
+
+        protected void Bootstrapper_Bootstrapped(object sender, EventArgs e)
         {
-            // Web API configuration and services
-            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
-            // Web API routes
-            config.MapHttpAttributeRoutes();
+            // Account for constructor injection in Controller types
+            // This controller factory initialization accounts for both MVC (Feather) widgets, and Classic MVC Mode Controllers
+            ObjectFactory.Container.RegisterType<ISitefinityControllerFactory, NinjectControllerFactory>(new ContainerControlledLifetimeManager());
+            ISitefinityControllerFactory factory = ObjectFactory.Resolve<ISitefinityControllerFactory>();
+            ControllerBuilder.Current.SetControllerFactory(factory);
 
-            config.EnsureInitialized();
+            // Account for constructor injection in ApiController types
+            GlobalConfiguration.Configuration.DependencyResolver = new NinjectDependencyResolver(NinjectKernel);
 
-            config.Routes.MapHttpRoute(
-                    name: "DefaultApi",
-                    routeTemplate: "api/{controller}/{id}/{action}",
-                    defaults: new { id = RouteParameter.Optional, action = RouteParameter.Optional }
-                );
+            this.RegisterWebApiRoute();
+            this.RegisterClassicMvcModeRoute();
+        }
+
+        /// <summary>
+        /// Enables WebApi calls
+        /// </summary>
+        /// <remarks>
+        /// This registration does not depend on Ninject and does not account for constructor injection
+        /// </remarks>
+        private void RegisterWebApiRoute()
+        {
+            GlobalConfiguration.Configuration.Routes.MapHttpRoute(
+                "DefaultApi",
+                "webapi/{controller}/{id}",
+                new { id = RouteParameter.Optional });
+        }
+
+        /// <summary>
+        /// Enables Classic MVC Mode
+        /// </summary>
+        /// <remarks>
+        /// This registration does not depend on Ninject and does not account for constructor injection
+        /// </remarks>
+        private void RegisterClassicMvcModeRoute()
+        {
+            RouteTable.Routes.MapRoute(
+                "Classic",
+                "classic/{controller}/{action}/{id}",
+                new { controller = "Feature", action = "Index", id = RouteParameter.Optional });
         }
     }
 }
